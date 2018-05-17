@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Linq;
 
 namespace Eshopworld.Data.CosmosDb
 {
@@ -33,19 +33,34 @@ namespace Eshopworld.Data.CosmosDb
                 item);
         }
 
-        public virtual async Task<Document> UpdateItemAsync(string id, T item)
+        public virtual async Task<Document> UpdateItemAsync(string id, T item, RequestOptions options = null)
         {
             return await Client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri(_databaseId, _collectionId, id),
-                item);
+                item, options);
         }
 
         public virtual async Task<T> GetItemAsync(string id)
         {
             try
             {
+                Document document = await GetDocumentAsync(id);
+                return (T)(dynamic)document;
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == HttpStatusCode.NotFound)
+                    return null;
+                throw;
+            }
+        }
+
+        public virtual async Task<Document> GetDocumentAsync(string id)
+        {
+            try
+            {
                 Document document =
                     await Client.ReadDocumentAsync(UriFactory.CreateDocumentUri(_databaseId, _collectionId, id));
-                return (T) (dynamic) document;
+                return document;
             }
             catch (DocumentClientException e)
             {
@@ -68,9 +83,18 @@ namespace Eshopworld.Data.CosmosDb
             return results;
         }
 
-        public virtual async Task DeleteItemAsync(string id)
+        public virtual async Task<bool> DeleteItemAsync(string id)
         {
-            await Client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(_databaseId, _collectionId, id));
+            try
+            {
+                await Client.DeleteDocumentAsync(UriFactory.CreateDocumentUri(_databaseId, _collectionId, id));
+            }
+            catch (DocumentClientException)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private async Task CreateDatabaseIfNotExistsAsync()

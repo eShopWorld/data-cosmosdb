@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using System;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Eshopworld.Data.CosmosDb.Tests
@@ -41,18 +45,30 @@ namespace Eshopworld.Data.CosmosDb.Tests
         }
 
         [Fact]
-        public void ItemIsDeleted()
+        public async Task ItemIsDeleted()
         {
-            var id = Guid.NewGuid();
+            var id = Guid.Parse("85eabd4c-3fd6-4f23-868c-2ad3621ea332");
             _documentDBRepository.CreateItemAsync(new Dummy
             {
                 Id = id,
                 Name = "DUMMY03"
             }).Wait();
 
-            _documentDBRepository.DeleteItemAsync(id.ToString()).Wait();
+            var response = await _documentDBRepository.DeleteItemAsync(id.ToString());
+
+            Assert.True(response);
             var item = _documentDBRepository.GetItemAsync(id.ToString()).Result;
             Assert.Null(item);
+        }
+
+        [Fact]
+        public async Task NonExistingItemIsNotDeleted()
+        {
+            var id = Guid.Parse("e5390dc0-d330-48e3-9fa1-36ab43286354");
+
+            var response = await _documentDBRepository.DeleteItemAsync(id.ToString());
+
+            Assert.False(response);
         }
 
         [Fact]
@@ -81,12 +97,47 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 Name = "DUMMY04"
             }).Wait();
 
-            var updatedDummy = new Dummy {Id = id, Name = "UPDATED"};
+            var updatedDummy = new Dummy { Id = id, Name = "UPDATED" };
             _documentDBRepository.UpdateItemAsync(id.ToString(), updatedDummy).Wait();
 
             var item = _documentDBRepository.GetItemAsync(id.ToString()).Result;
             Assert.Equal("UPDATED", item.Name);
             _documentDBRepository.DeleteItemAsync(id.ToString()).Wait();
+        }
+
+        [Fact]
+        public async Task ShouldThrowForInvalidETag()
+        {
+            var id = Guid.Parse("6f04d6ae-6b03-44a9-837f-8c5141618060");
+            _documentDBRepository.CreateItemAsync(new Dummy
+            {
+                Id = id,
+                Name = "DUMMY04"
+            }).Wait();
+
+            var document = await _documentDBRepository.GetDocumentAsync(id.ToString());
+
+            var updatedDummy = (Dummy)(dynamic)document;
+            updatedDummy.Name = "UPDATED";
+
+            // Using Access Conditions gives us the ability to use the ETag from our fetched document for optimistic concurrency.
+            var ac = new AccessCondition { Condition = document.ETag, Type = AccessConditionType.IfMatch };
+
+            // Update our document, which will succeed with the correct ETag 
+            await _documentDBRepository.UpdateItemAsync(id.ToString(), updatedDummy, new RequestOptions { AccessCondition = ac });
+
+            var item = await _documentDBRepository.GetItemAsync(id.ToString());
+            Assert.Equal("UPDATED", item.Name);
+
+            // Update our document again, which will fail since our (same) ETag is now invalid 
+            var ex = await Assert.ThrowsAsync<DocumentClientException>(async () =>
+            {
+                await _documentDBRepository.UpdateItemAsync(id.ToString(), updatedDummy, new RequestOptions { AccessCondition = ac });
+            });
+
+            Assert.Equal(HttpStatusCode.PreconditionFailed, ex?.StatusCode);
+
+            await _documentDBRepository.DeleteItemAsync(id.ToString());
         }
 
         [Fact]
