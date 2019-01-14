@@ -11,7 +11,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
     /// <summary>
     /// Document Repository Tests and Collection to create just a single collection for each test run and dispose when complete 
     /// </summary>
-    [Collection("Database Collection")]
+    [Collection(nameof(DatabaseCollection))]
     public class DocumentDBRepositoryTests
     {
         private readonly DocumentDBRepository<Dummy> _documentDBRepository;

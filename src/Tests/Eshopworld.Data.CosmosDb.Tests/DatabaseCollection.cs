@@ -5,7 +5,7 @@
     /// <summary>
     /// Need the definition to wire the collection to the fixture
     /// </summary>
-    [CollectionDefinition("Database Collection")]
+    [CollectionDefinition(nameof(DatabaseCollection))]
     public class DatabaseCollection : ICollectionFixture<CosmosDbFixture>
     {
 
