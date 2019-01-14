@@ -12,6 +12,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
     {
         public DocumentDBRepositoryTests()
         {
+            //todo these should come from a keyvault so they can be tested locally and remotely.
             var endPoint = Environment.GetEnvironmentVariable("endPoint");
             var authKey = Environment.GetEnvironmentVariable("authKey");
             var databaseId = Environment.GetEnvironmentVariable("databaseId");
