@@ -23,10 +23,10 @@ namespace Eshopworld.Data.CosmosDb
             _collectionId = collectionId;
             Client = new DocumentClient(new Uri(endpoint), authKey); // Todo: Implement direct TCP connectivity.
             CreateDatabaseIfNotExistsAsync().Wait();
-            CreateCollectionIfNotExistsAsync(1000).Wait();
+            CreateCollectionIfNotExistsAsync(400).Wait();
             // Todo: Consider performance-tuning: https://docs.microsoft.com/en-us/azure/cosmos-db/performance-tips
         }
-
+        
         public virtual async Task<Document> CreateItemAsync(T item)
         {
             return await Client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionId),

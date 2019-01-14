@@ -110,6 +110,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CosmosDbFixture.cs" />
+    <Compile Include="DatabaseCollection.cs" />
     <Compile Include="DocumentDBRepositoryTests.cs" />
     <Compile Include="Dummy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
