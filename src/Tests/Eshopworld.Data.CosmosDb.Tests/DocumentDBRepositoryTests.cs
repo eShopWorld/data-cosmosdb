@@ -8,26 +8,18 @@ using Xunit;
 
 namespace Eshopworld.Data.CosmosDb.Tests
 {
+    /// <summary>
+    /// Document Repository Tests and Collection to create just a single collection for each test run and dispose when complete 
+    /// </summary>
+    [Collection("Database Collection")]
     public class DocumentDBRepositoryTests
     {
-        public DocumentDBRepositoryTests()
-        {
-            //todo these should come from a keyvault so they can be tested locally and remotely.
-            var endPoint = Environment.GetEnvironmentVariable("endPoint");
-            var authKey = Environment.GetEnvironmentVariable("authKey");
-            var databaseId = Environment.GetEnvironmentVariable("databaseId");
-            var collectionId = Environment.GetEnvironmentVariable("collectionId");
-
-            _documentDBRepository = new DocumentDBRepository<Dummy>();
-            _documentDBRepository.Initialize(endPoint, authKey, databaseId, collectionId);
-        }
-
-        public void Dispose()
-        {
-            _documentDBRepository.Client?.Dispose();
-        }
-
         private readonly DocumentDBRepository<Dummy> _documentDBRepository;
+
+        public DocumentDBRepositoryTests(CosmosDbFixture fixture)
+        {
+            _documentDBRepository = fixture.DocumentDbRepository;
+        }
 
         [Fact]
         public void ItemIsCreated()
