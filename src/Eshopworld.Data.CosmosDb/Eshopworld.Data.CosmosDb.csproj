@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
     <Description>Cosmos DB CRUD functionality.</Description>
-    <Version>1.2.1</Version>
+    <Version>1.1.1</Version>
     <PackageReleaseNotes>Update package to latest dependencies</PackageReleaseNotes>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
