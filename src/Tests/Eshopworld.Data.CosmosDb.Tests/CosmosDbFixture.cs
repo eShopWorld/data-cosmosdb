@@ -1,8 +1,8 @@
-﻿namespace Eshopworld.Data.CosmosDb.Tests
-{
-    using System;
-    using Microsoft.Azure.Documents.Client;
+﻿using System;
+using Microsoft.Azure.Documents.Client;
 
+namespace Eshopworld.Data.CosmosDb.Tests
+{
     /// <summary>
     /// Using a XUnit Fixture allows for a one time create and dispose of resources for the integration test when a class is annotated with an appropriate collection definition
     /// </summary>

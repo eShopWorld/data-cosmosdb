@@ -1,7 +1,7 @@
-﻿namespace Eshopworld.Data.CosmosDb.Tests
-{
-    using Xunit;
+﻿using Xunit;
 
+namespace Eshopworld.Data.CosmosDb.Tests
+{
     /// <summary>
     /// Need the definition to wire the collection to the fixture
     /// </summary>
