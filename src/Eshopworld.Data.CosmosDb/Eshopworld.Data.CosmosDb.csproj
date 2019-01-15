@@ -4,8 +4,21 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
     <Description>Cosmos DB CRUD functionality.</Description>
-    <version>1.1.0</version>
+    <Version>1.2.1</Version>
+    <PackageReleaseNotes>Update package to latest dependencies</PackageReleaseNotes>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <DebugType>Portable</DebugType>
+    <IncludeSource>True</IncludeSource>
+    <IsPackable>True</IsPackable>
+    <Authors>Paul Mooney, David Guerin</Authors>
+    <Company>eShopWorld</Company>
+    <PackageLicenseUrl>https://github.com/eShopWorld/data-cosmosdb/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/eShopWorld/data-cosmosdb</PackageProjectUrl>
+    <Copyright>Copyright 2019</Copyright>
+    <PackageTags>Eshopworld, Caching, CosmosDB, Azure</PackageTags>
   </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.2.1" />
