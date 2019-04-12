@@ -2,12 +2,12 @@
 
 namespace Eshopworld.Data.CosmosDb.SessionHandling
 {
-    public class FrontendCosmosDbSessionTokenProvider : ICosmosDbSessionTokenProvider
+    public class NonPassthroughCosmosDbSessionTokenProvider : ICosmosDbSessionTokenProvider
     {
         private static readonly object SessionTokenItemKey = new object();
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FrontendCosmosDbSessionTokenProvider(IHttpContextAccessor httpContextAccessor)
+        public NonPassthroughCosmosDbSessionTokenProvider(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

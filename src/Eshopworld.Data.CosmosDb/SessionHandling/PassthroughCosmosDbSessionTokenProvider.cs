@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace Eshopworld.Data.CosmosDb.SessionHandling
 {
-    internal class BackendCosmosDbSessionTokenProvider : ICosmosDbSessionTokenProvider
+    internal class PassthroughCosmosDbSessionTokenProvider : ICosmosDbSessionTokenProvider
     {
         private static readonly object SessionTokenItemKey = new object();
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BackendCosmosDbSessionTokenProvider(IHttpContextAccessor httpContextAccessor)
+        public PassthroughCosmosDbSessionTokenProvider(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }

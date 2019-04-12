@@ -9,16 +9,23 @@ namespace Eshopworld.Data.CosmosDb
 {
     public static class ContainerBuilderExtensions
     {
-        public static ContainerBuilder AddCosmosSessionRelay(this ContainerBuilder containerBuilder, bool isFrontend)
+        /// <summary>
+        /// Adds support for passing Cosmos DB session tokens.
+        /// </summary>
+        /// <param name="containerBuilder">The container builder.</param>
+        /// <param name="passthrough">If true session tokens are accepted from the incomming HTTP request and returned in its response. Otherwise
+        /// session tokens are handled internally and the incomming HTTP request is not used.</param>
+        /// <returns></returns>
+        public static ContainerBuilder AddCosmosSessionRelay(this ContainerBuilder containerBuilder, bool passthrough)
         {
-            if (isFrontend)
+            if (passthrough)
             {
-                containerBuilder.RegisterType<FrontendCosmosDbSessionTokenProvider>()
+                containerBuilder.RegisterType<NonPassthroughCosmosDbSessionTokenProvider>()
                     .As<ICosmosDbSessionTokenProvider>();
             }
             else
             {
-                containerBuilder.RegisterType<BackendCosmosDbSessionTokenProvider>()
+                containerBuilder.RegisterType<PassthroughCosmosDbSessionTokenProvider>()
                     .As<ICosmosDbSessionTokenProvider>();
             }
 
@@ -36,7 +43,6 @@ namespace Eshopworld.Data.CosmosDb
                     var sessionProvider = c.Resolve<ICosmosDbSessionTokenProvider>();
                     return new SessionProxyDocumentClient(client, sessionProvider);
                 });
-
 
             return containerBuilder;
         }
