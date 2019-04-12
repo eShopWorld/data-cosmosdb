@@ -5,7 +5,6 @@ namespace Eshopworld.Data.CosmosDb.SessionHandling
 {
     internal class BackendCosmosDbSessionTokenProvider : ICosmosDbSessionTokenProvider
     {
-        private const string SessionTokenHeaderName = "x-ms-session-token";
         private static readonly object SessionTokenItemKey = new object();
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -19,15 +18,15 @@ namespace Eshopworld.Data.CosmosDb.SessionHandling
             get
             {
                 var context = _httpContextAccessor.HttpContext;
-                var sessionTokenValues = context.Response.Headers[SessionTokenHeaderName];
+                var sessionTokenValues = context.Response.Headers[Constants.SessionTokenHeaderName];
                 if (sessionTokenValues.Count != 1)
-                    sessionTokenValues = context.Request.Headers[SessionTokenHeaderName];
+                    sessionTokenValues = context.Request.Headers[Constants.SessionTokenHeaderName];
                 return sessionTokenValues.Count == 1 ? sessionTokenValues.First() : null;
             }
             set
             {
                 var context = _httpContextAccessor.HttpContext;
-                context.Response.Headers[SessionTokenHeaderName] = value;
+                context.Response.Headers[Constants.SessionTokenHeaderName] = value;
             }
         }
     }
