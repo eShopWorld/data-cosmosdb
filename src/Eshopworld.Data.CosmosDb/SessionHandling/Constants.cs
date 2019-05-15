@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Eshopworld.Data.CosmosDb.SessionHandling
+﻿namespace Eshopworld.Data.CosmosDb.SessionHandling
 {
     internal static class Constants
     {
