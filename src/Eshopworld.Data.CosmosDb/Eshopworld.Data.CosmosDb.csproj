@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
     <Description>Cosmos DB CRUD functionality.</Description>
-    <Version>1.1.1</Version>
-    <PackageReleaseNotes>Update package to latest dependencies</PackageReleaseNotes>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>2.0.0</Version>
+    <PackageReleaseNotes>New version</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>
     <IsPackable>True</IsPackable>
-    <Authors>Paul Mooney, David Guerin</Authors>
+    <Authors>Paul Mooney, David Guerin, Antonino Parisi</Authors>
     <Company>eShopWorld</Company>
     <PackageLicenseUrl>https://github.com/eShopWorld/data-cosmosdb/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/eShopWorld/data-cosmosdb</PackageProjectUrl>
-    <Copyright>Copyright 2019</Copyright>
+    <Copyright>Copyright 2020</Copyright>
     <PackageTags>Eshopworld, Caching, CosmosDB, Azure</PackageTags>
   </PropertyGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.2.1" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Eshopworld.Core" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.10.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
 </Project>
