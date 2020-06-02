@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eshopworld.Data.CosmosDb", "Eshopworld.Data.CosmosDb\Eshopworld.Data.CosmosDb.csproj", "{68529AF7-B451-41D5-9289-B5A2CF52CE47}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3FC28000-66E4-487A-9E8D-4A4F8146C418}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eshopworld.Data.CosmosDb.Tests", "Tests\Eshopworld.Data.CosmosDb.Tests\Eshopworld.Data.CosmosDb.Tests.csproj", "{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{68529AF7-B451-41D5-9289-B5A2CF52CE47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68529AF7-B451-41D5-9289-B5A2CF52CE47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68529AF7-B451-41D5-9289-B5A2CF52CE47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0DBFBD5D-C034-4C86-A0D1-02CE0210922D} = {3FC28000-66E4-487A-9E8D-4A4F8146C418}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2A94AE0F-EE02-4A8A-9C34-120211A52DF0}

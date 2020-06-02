@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Azure.Documents.Client;
 
 namespace Eshopworld.Data.CosmosDb.Tests
 {
@@ -13,19 +12,26 @@ namespace Eshopworld.Data.CosmosDb.Tests
         private readonly string authKey = Environment.GetEnvironmentVariable("authKey");
         private readonly string databaseId = Environment.GetEnvironmentVariable("databaseId");
         private readonly string collectionId = Environment.GetEnvironmentVariable("collectionId");
+        
+        public CosmosDbConfiguration Configuration { get; }
 
         public CosmosDbFixture()
         {
-            DocumentDbRepository = new DocumentDBRepository<Dummy>();
-            DocumentDbRepository.Initialize(endPoint, authKey, databaseId, collectionId);
+            Configuration = new CosmosDbConfiguration
+            {
+                DatabaseEndpoint = endPoint,
+                DatabaseKey = authKey,
+                Databases =
+                {
+                   [databaseId] = new CosmosDbCollectionSettings[] { 
+                       new CosmosDbCollectionSettings() { CollectionName = collectionId } 
+                   }
+                }
+            };
         }
-
-        internal readonly DocumentDBRepository<Dummy> DocumentDbRepository;
 
         public void Dispose()
         {
-            DocumentDbRepository.Client.DeleteDatabaseAsync(UriFactory.CreateDatabaseUri(databaseId)).Wait();
-            DocumentDbRepository.Client?.Dispose();
         }
     }
 }
