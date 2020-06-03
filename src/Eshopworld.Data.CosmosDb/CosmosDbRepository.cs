@@ -1,8 +1,6 @@
-﻿using Eshopworld.Data.CosmosDb.Exceptions;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Linq;
-using Microsoft.Extensions.Options;
+﻿using Eshopworld.Core;
+using Eshopworld.Data.CosmosDb.Exceptions;
+using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,105 +13,90 @@ namespace Eshopworld.Data.CosmosDb
     public class CosmosDbRepository : ICosmosDbRepository
     {
         private readonly ICosmosDbClientFactory _clientFactory;
+        private readonly IBigBrother _bigBrother;
         private readonly CosmosDbConfiguration _dbSetup;
         private string _databaseId;
-        private string _collectionName;
+        private string _containerName;
 
-        private IDocumentClient dbClient;
-        public IDocumentClient DbClient => dbClient ?? (dbClient = _clientFactory.InitialiseClient(_dbSetup));
+        private CosmosClient _dbClient;
+        private Container _container;
 
-        public CosmosDbRepository(IOptions<CosmosDbConfiguration> setup, ICosmosDbClientFactory factory)
-            : this(setup.Value, factory)
-        { }
-
-        public CosmosDbRepository(CosmosDbConfiguration setup, ICosmosDbClientFactory factory)
+        public CosmosDbRepository(
+            CosmosDbConfiguration setup,
+            ICosmosDbClientFactory factory,
+            IBigBrother bigBrother)
         {
             _dbSetup = setup ?? throw new ArgumentNullException(nameof(setup));
             _clientFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+            _bigBrother = bigBrother ?? throw new ArgumentNullException(nameof(bigBrother));
 
             if (_dbSetup.TryGetDefaults(out var dbId, out var collectionName))
-            {
                 UseCollection(collectionName, dbId);
-            }
         }
+
+        public CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup);
+
+        public Container DbContainer => _container ??= DbClient.GetContainer(_databaseId, _containerName);
 
         public void UseCollection(string collectionName, string databaseId = null)
         {
             if (databaseId != null && !_dbSetup.Databases.ContainsKey(databaseId))
-            {
                 throw new ArgumentException($"The database id '{databaseId}' is not configured");
-            }
 
-            this._databaseId = databaseId ?? this._databaseId;
+            _databaseId = databaseId ?? _databaseId;
 
-            if (_dbSetup.Databases[this._databaseId].All(c => c.CollectionName != collectionName))
-            {
-                throw new ArgumentException($"The collection '{collectionName}' is not configured for '{this._databaseId}' database");
-            }
+            if (_dbSetup.Databases[_databaseId].All(c => c.CollectionName != collectionName))
+                throw new ArgumentException($"The collection '{collectionName}' is not configured for '{_databaseId}' database");
 
-            this._collectionName = collectionName;
+            _containerName = collectionName;
         }
 
-        public async Task<Document> CreateAsync<T>(T data)
+        public async Task<T> CreateAsync<T>(T data)
         {
-            var collectionUri = UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionName);
-
             return await ExecuteFunction(async () =>
             {
-                var response = await DbClient.CreateDocumentAsync(collectionUri, data);
+                var response = await DbContainer.CreateItemAsync(data);
+                return response.Resource;
+            });
+        }
+
+        public async Task<T> UpsertAsync<T>(T data)
+        {
+            return await ExecuteFunction(async () =>
+            {
+                var response = await DbContainer.UpsertItemAsync(data);
+                return response.Resource;
+            });
+        }
+
+        public async Task<T> ReplaceAsync<T>(string id, T data, string etag)
+        {
+            return await ExecuteFunction(async () =>
+            {
+                var itemRequestOptions = etag != null
+                    ? new ItemRequestOptions { IfMatchEtag = etag }
+                    : null;
+                var response = await DbContainer.ReplaceItemAsync(
+                    data,
+                    id,
+                    requestOptions: itemRequestOptions);
 
                 return response.Resource;
             });
         }
 
-        public async Task<Document> UpsertAsync<T>(T data)
+        public async Task<bool> DeleteAsync<T>(string id, string partitionKey)
         {
-            var collectionUri = UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionName);
-
-            return await ExecuteFunction(async () =>
-            {
-                var response = await DbClient.UpsertDocumentAsync(collectionUri, data);
-                return response.Resource;
-            });
-        }
-
-        public async Task<Document> ReplaceAsync<T>(string id, T data, string etag)
-        {
-            return await ExecuteFunction(async () =>
-            {
-                var options = new RequestOptions();
-
-                if (etag != null)
-                    options.AccessCondition = new AccessCondition
-                    {
-                        Type = AccessConditionType.IfMatch,
-                        Condition = etag
-                    };
-
-                var documentUri = UriFactory.CreateDocumentUri(_databaseId, _collectionName, id);
-                var response = await DbClient.ReplaceDocumentAsync(documentUri, data, options);
-                return response.Resource;
-            });
-        }
-
-        public async Task<bool> DeleteAsync<TPartitionKey>(string id, TPartitionKey partitionKey)
-        {
-            var documentUri = UriFactory.CreateDocumentUri(_databaseId, _collectionName, id);
-
             return await ExecuteFunction(async () =>
             {
                 try
                 {
-                    await DbClient.DeleteDocumentAsync(documentUri, new RequestOptions
-                    {
-                        PartitionKey = new PartitionKey(partitionKey)
-                    });
-
+                    await DbContainer.DeleteItemAsync<T>(id, new PartitionKey(partitionKey));
                     return true;
                 }
-                catch (DocumentClientException exception)
+                catch (CosmosException ex)
                 {
-                    if (exception.StatusCode == HttpStatusCode.NotFound && IsErrorMessageForDocumentResource(exception.Error.Message))
+                    if (ex.StatusCode == HttpStatusCode.NotFound)
                     {
                         return false;
                     }
@@ -123,28 +106,32 @@ namespace Eshopworld.Data.CosmosDb
             });
         }
 
-        public Task<IEnumerable<T>> QueryAsync<T>(QueryDefinition queryDef)
+        public Task<IEnumerable<T>> QueryAsync<T>(CosmosQuery cosmosQueryDef)
         {
-            if (queryDef == null) throw new ArgumentNullException(nameof(queryDef));
+            if (cosmosQueryDef == null) throw new ArgumentNullException(nameof(cosmosQueryDef));
 
-            return QueryInternalAsync<T>(queryDef);
+            return QueryInternalAsync<T>(cosmosQueryDef);
         }
 
-        private async Task<IEnumerable<T>> QueryInternalAsync<T>(QueryDefinition queryDef)
+        private async Task<IEnumerable<T>> QueryInternalAsync<T>(CosmosQuery cosmosQueryDef)
         {
             return await ExecuteFunction(async () =>
             {
-                var items = new List<T>();
-
-                var collectionUri = UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionName);
-                var feedOptions = new FeedOptions { EnableCrossPartitionQuery = queryDef.RequiresCrossPartitions };
-                var result = DbClient
-                    .CreateDocumentQuery<T>(collectionUri, queryDef.QuerySpec, feedOptions)
-                    .AsDocumentQuery();
-
-                while (result.HasMoreResults)
+                QueryRequestOptions requestOptions = null;
+                if (!string.IsNullOrEmpty(cosmosQueryDef.PartitionKey))
                 {
-                    var batch = await result.ExecuteNextAsync<T>();
+                    requestOptions = new QueryRequestOptions
+                    {
+                        PartitionKey = new PartitionKey(cosmosQueryDef.PartitionKey)
+                    };
+                }
+
+                var iterator = DbContainer.GetItemQueryIterator<T>(cosmosQueryDef.QueryDefinition, null, requestOptions);
+
+                var items = new List<T>();
+                while (iterator.HasMoreResults)
+                {
+                    var batch = await iterator.ReadNextAsync();
                     items.AddRange(batch);
                 }
 
@@ -152,9 +139,9 @@ namespace Eshopworld.Data.CosmosDb
             });
         }
 
-        public async Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(QueryDefinition queryDef)
+        public async Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(CosmosQuery cosmosQueryDef)
         {
-            var items = await QueryAsync<dynamic>(queryDef);
+            var items = await QueryAsync<dynamic>(cosmosQueryDef);
             return items.Select(MapInstance<T>);
         }
 
@@ -164,9 +151,7 @@ namespace Eshopworld.Data.CosmosDb
             var eTag = jToken["_etag"]?.ToString();
 
             if (eTag == null)
-            {
-                throw new ArgumentException("The query provided does not return ETag information");
-            }
+                throw new ArgumentException("Provided query does not return eTag information");
 
             return new DocumentContainer<T>(jToken.ToObject<T>(), eTag);
         }
@@ -174,45 +159,39 @@ namespace Eshopworld.Data.CosmosDb
         private async Task<TResult> ExecuteFunction<TResult>(Func<Task<TResult>> func)
         {
             while (true)
-            {
                 try
                 {
                     return await func();
                 }
-                catch (DocumentClientException ex) when (ex.StatusCode == HttpStatusCode.PreconditionFailed)
+                catch (CosmosException ex) when (IsCollectionOrDatabaseMissing(ex))
+                {
+                    InvalidateClient();
+                }
+                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.PreconditionFailed)
                 {
                     throw new StaleDataException();
                 }
-                catch (DocumentClientException ex) when ((ex.StatusCode == HttpStatusCode.NotFound ||
-                                                          ex.StatusCode == HttpStatusCode.Gone) &&
-                                                         !IsErrorMessageForDocumentResource(ex.Error.Message))
+                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
                 {
-                    // this seems like an error - status code in exception is 404 but in the message details it is 410
-                    // when DB/collection are deleted for some operations
-                    InvalidateClient();
+                    await Task.Delay(ex.RetryAfter ?? TimeSpan.FromSeconds(1.0));
                 }
-                catch (DocumentClientException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
-                {
-                    await Task.Delay(ex.RetryAfter);
-                }
-                catch (DocumentClientException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
                     throw new MissingDocumentException();
                 }
-            }
+                catch (CosmosException ex)
+                {
+                    _bigBrother.Publish(ex.ToExceptionEvent());
+                    throw;
+                }
         }
 
-        // there is no easy way to determine if a DB/collection is not found or simply document could be found
-        // from error message inspection, the below should be present only for missing document (client ok)
-        // when collection/DB are deleted, status code in message text is 404 but resource type is 'collection'.
-        // however, that is not the case when Delete is performed - in tha case, StatusCode is 410 in the message text
-        // and the resource type is 'document'
-        private bool IsErrorMessageForDocumentResource(string message) => 
-            message.Contains("StatusCode: 404") && message.Contains("ResourceType: Document");
+        private bool IsCollectionOrDatabaseMissing(CosmosException exception) => exception.StatusCode == HttpStatusCode.NotFound && exception.Message.Contains("ResourceType: Collection");
 
         private void InvalidateClient()
         {
-            dbClient = null;
+            _dbClient = null;
+            _container = null;
             _clientFactory.Invalidate();
         }
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Cosmos;
 
 namespace Eshopworld.Data.CosmosDb
 {
@@ -11,7 +11,7 @@ namespace Eshopworld.Data.CosmosDb
         /// </summary>
         /// <param name="config">Database and collection settings</param>
         /// <returns>Instance of a db client</returns>
-        IDocumentClient InitialiseClient(CosmosDbConfiguration config);
+        CosmosClient InitialiseClient(CosmosDbConfiguration config);
 
         /// <summary>
         /// If any client is cached, this will invalidate (dispose) the client connection and subsequent call to InitialiseClient

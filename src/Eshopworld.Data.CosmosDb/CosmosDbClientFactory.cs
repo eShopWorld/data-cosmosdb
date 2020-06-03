@@ -1,8 +1,8 @@
 ﻿using Eshopworld.Core;
 using Eshopworld.Data.CosmosDb.Telemetry;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Cosmos;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,14 +13,14 @@ namespace Eshopworld.Data.CosmosDb
         private readonly object _sync = new object();
         private readonly IBigBrother _bb;
 
-        private DocumentClient _client;
+        private CosmosClient _client;
 
         public CosmosDbClientFactory(IBigBrother bb)
         {
             _bb = bb ?? throw new ArgumentNullException(nameof(bb));
         }
 
-        public IDocumentClient InitialiseClient(CosmosDbConfiguration config)
+        public CosmosClient InitialiseClient(CosmosDbConfiguration config)
         {
             if (_client != null) return _client;
 
@@ -32,34 +32,11 @@ namespace Eshopworld.Data.CosmosDb
             {
                 if (_client != null) return _client;
 
-                var client = new DocumentClient(new Uri(config.DatabaseEndpoint), config.DatabaseKey);
-
-                var databaseTasks = config.Databases
-                    .Select(kv => client.CreateDatabaseIfNotExistsAsync(
-                       new Database { Id = kv.Key },
-                       new RequestOptions { OfferThroughput = config.Throughput }))
-                    .ToArray();
-
-                Task.WhenAll(databaseTasks)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-
-                // this should be executed after the DB is created
-                var collectionTasks = config.Databases
-                    .SelectMany(kv =>
-                       kv.Value.Select(col =>
-                              client.CreateDocumentCollectionIfNotExistsAsync(
-                                  UriFactory.CreateDatabaseUri(kv.Key),
-                                  SetupCollection(col)
-                              )
-                       ))
-                    .ToArray();
-
-                Task.WhenAll(collectionTasks)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
+                var client = new CosmosClient(config.DatabaseEndpoint, config.DatabaseKey);
+                foreach (var (databaseName, containerSettings) in config.Databases)
+                {
+                    CreateDatabaseIfNotExistsAsync(config, client, databaseName, containerSettings).Wait();
+                }
 
                 _client = client;
 
@@ -67,6 +44,34 @@ namespace Eshopworld.Data.CosmosDb
             }
 
             return _client;
+        }
+
+        private static async Task CreateDatabaseIfNotExistsAsync(
+            CosmosDbConfiguration config,
+            CosmosClient client,
+            string databaseName,
+            IEnumerable<CosmosDbCollectionSettings> containerSettings)
+        {
+            IEnumerable<Task<ContainerResponse>> CreateContainersIfNotExistAsync(Microsoft.Azure.Cosmos.Database alreadyCreatedDatabase)
+            {
+                foreach (var container in containerSettings)
+                {
+                    var containerProperties = new ContainerProperties
+                    {
+                        Id = container.CollectionName,
+                        PartitionKeyPath = container.PartitionKey,
+                        UniqueKeyPolicy = GetUniqueKeyPolicy(container),
+                        DefaultTimeToLive = config.DefaultTimeToLive
+                    };
+                    yield return alreadyCreatedDatabase.CreateContainerIfNotExistsAsync(containerProperties);
+                }
+            }
+
+            var createDatabaseResponse = await client.CreateDatabaseIfNotExistsAsync(databaseName, config.Throughput);
+            var database = createDatabaseResponse.Database;
+
+            var createContainersTasks = CreateContainersIfNotExistAsync(database);
+            await Task.WhenAll(createContainersTasks);
         }
 
         public void Invalidate()
@@ -86,7 +91,7 @@ namespace Eshopworld.Data.CosmosDb
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -107,35 +112,22 @@ namespace Eshopworld.Data.CosmosDb
             LogEvent("Configuration verified");
         }
 
-        private DocumentCollection SetupCollection(CosmosDbCollectionSettings setup)
+        private static UniqueKeyPolicy GetUniqueKeyPolicy(CosmosDbCollectionSettings container)
         {
-
-            var collection = new DocumentCollection
+            var uniqueKeyPolicy = new UniqueKeyPolicy();
+            foreach (var paths in container.UniqueKeys ?? Enumerable.Empty<string>())
             {
-                Id = setup.CollectionName,
-            };
+                var uniqueKey = new UniqueKey();
 
-            if (!string.IsNullOrWhiteSpace(setup.PartitionKey))
-            {
-                collection.PartitionKey.Paths.Add(setup.PartitionKey);
-            }
-
-            if (setup.UniqueKeys != null && setup.UniqueKeys.Any())
-            {
-                foreach (var paths in setup.UniqueKeys)
+                foreach (var path in paths.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var uniqueKey = new UniqueKey();
-
-                    foreach (var path in paths.Split(",", StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        uniqueKey.Paths.Add(path.Trim());
-                    }
-
-                    collection.UniqueKeyPolicy.UniqueKeys.Add(uniqueKey);
+                    uniqueKey.Paths.Add(path.Trim());
                 }
+
+                uniqueKeyPolicy.UniqueKeys.Add(uniqueKey);
             }
 
-            return collection;
+            return uniqueKeyPolicy;
         }
 
         private void LogEvent(string message)

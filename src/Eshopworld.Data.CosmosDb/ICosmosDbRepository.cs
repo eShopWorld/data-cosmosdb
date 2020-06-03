@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Documents;
+﻿using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace Eshopworld.Data.CosmosDb
         /// <summary>
         /// Defines instance of a client for cosmos db
         /// </summary>
-        IDocumentClient DbClient { get; }
+        CosmosClient DbClient { get; }
 
         /// <summary>
         /// Defines the collection (and from which database) that should be used by the repository.
@@ -27,7 +27,7 @@ namespace Eshopworld.Data.CosmosDb
         /// <typeparam name="T">Type of the document data</typeparam>
         /// <param name="data">Document data</param>
         /// <returns>Generic instance of the newly created document</returns>
-        Task<Document> CreateAsync<T>(T data);
+        Task<T> CreateAsync<T>(T data);
 
         /// <summary>
         /// Creates or replaces existing document in the database
@@ -35,7 +35,7 @@ namespace Eshopworld.Data.CosmosDb
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
         /// <returns></returns>
-        Task<Document> UpsertAsync<T>(T data);
+        Task<T> UpsertAsync<T>(T data);
 
         /// <summary>
         /// Replaces existing document with given identifier with the provided data
@@ -48,7 +48,7 @@ namespace Eshopworld.Data.CosmosDb
         /// <param name="etag">Optional - matching etag condition for the update to take place</param>
         /// <returns></returns>
         /// <exception cref="StaleDataException">When provided etag does not match the one record in the document being updated</exception>
-        Task<Document> ReplaceAsync<T>(string id, T data, string etag);
+        Task<T> ReplaceAsync<T>(string id, T data, string etag);
 
         /// <summary>
         /// Deletes a document with a given identifier
@@ -56,24 +56,24 @@ namespace Eshopworld.Data.CosmosDb
         /// <param name="id"></param>
         /// <param name="partitionKey"></param>
         /// <returns>True if document was deleted, False if not found</returns>
-        Task<bool> DeleteAsync<TPartitionKey>(string id, TPartitionKey partitionKey);
+        Task<bool> DeleteAsync<T>(string id, string partitionKey);
 
         /// <summary>
         /// Queries for documents based on the given query.
         /// Returns full list of retrieved documents.
         /// </summary>
         /// <typeparam name="T">Type of document data</typeparam>
-        /// <param name="queryDef">Query definition</param>
+        /// <param name="cosmosQueryDef">Query definition</param>
         /// <returns>Collection of documents matching given query</returns>
-        Task<IEnumerable<T>> QueryAsync<T>(QueryDefinition queryDef);
+        Task<IEnumerable<T>> QueryAsync<T>(CosmosQuery cosmosQueryDef);
 
         /// <summary>
         /// Queries for documents based on the given query.
         /// Returns full list of retrieved documents wrapped with document meta-data
         /// </summary>
         /// <typeparam name="T">Type of document data</typeparam>
-        /// <param name="queryDef">Query definition</param>
+        /// <param name="cosmosQueryDef">Query definition</param>
         /// <returns>Collection of documents matching given query with extended meta-data for each document</returns>
-        Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(QueryDefinition queryDef);
+        Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(CosmosQuery cosmosQueryDef);
     }
 }

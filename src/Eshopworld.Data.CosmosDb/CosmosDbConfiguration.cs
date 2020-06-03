@@ -7,8 +7,8 @@ namespace Eshopworld.Data.CosmosDb
     {
         public string DatabaseEndpoint { get; set; }
         public string DatabaseKey { get; set; }
-
         public int Throughput { get; set; } = 400;
+        public int? DefaultTimeToLive { get; set; }
 
         /// <summary>
         /// Defines list of databases with their settings.

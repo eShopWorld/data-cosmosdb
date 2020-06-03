@@ -1,14 +1,17 @@
-﻿using Microsoft.Azure.Documents;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 
 namespace Eshopworld.Data.CosmosDb.Extensions
 {
-    public static class CosmosDbRepositoryInterfaceExtensions
+    public static class CosmosDbRepositoryExtensions
     {
-        public static Task<IEnumerable<T>> QueryAsync<T>(this ICosmosDbRepository repo, string query, bool crossPartitionQuery)
+        public static Task<IEnumerable<T>> QueryAsync<T>(
+            this ICosmosDbRepository repo,
+            QueryDefinition queryDefinition,
+            string partitionKey = null)
         {
-            return repo.QueryAsync<T>(new QueryDefinition(query, crossPartitionQuery));
+            return repo.QueryAsync<T>(new CosmosQuery(queryDefinition, partitionKey));
         }
 
         /// <summary>
@@ -18,7 +21,7 @@ namespace Eshopworld.Data.CosmosDb.Extensions
         /// <param name="id">Identifier of the document that is to be replaced</param>
         /// <param name="data">New version of the document data</param>
         /// <returns></returns>
-        public static Task<Document> ReplaceAsync<T>(this ICosmosDbRepository repo, string id, T data)
+        public static Task<T> ReplaceAsync<T>(this ICosmosDbRepository repo, string id, T data)
         {
             return repo.ReplaceAsync(id, data, null);
         }
