@@ -139,6 +139,23 @@ namespace Eshopworld.Data.CosmosDb
             });
         }
 
+        public Task<IEnumerable<T>> QueryAsync<T>(QueryDefinition queryDefinition, string partitionKey = null)
+        {
+            return QueryAsync<T>(new CosmosQuery(queryDefinition, partitionKey));
+        }
+
+        /// <summary>
+        /// Replaces existing document with given identifier with the provided data
+        /// </summary>
+        /// <typeparam name="T">Type of document data</typeparam>
+        /// <param name="id">Identifier of the document that is to be replaced</param>
+        /// <param name="data">New version of the document data</param>
+        /// <returns></returns>
+        public Task<T> ReplaceAsync<T>(string id, T data)
+        {
+            return ReplaceAsync(id, data, null);
+        }
+
         public async Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(CosmosQuery cosmosQueryDef)
         {
             var items = await QueryAsync<dynamic>(cosmosQueryDef);

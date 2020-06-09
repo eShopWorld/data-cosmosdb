@@ -30,5 +30,11 @@ namespace Eshopworld.Data.CosmosDb
             collectionName = null;
             return false;
         }
+
+        public bool HasCosmosEndpointAndKey()
+        {
+            return !string.IsNullOrEmpty(DatabaseEndpoint) &&
+                   !string.IsNullOrEmpty(DatabaseKey);
+        }
     }
 }

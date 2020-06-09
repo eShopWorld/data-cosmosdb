@@ -3,10 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Eshopworld.Data.CosmosDb.Extensions
 {
-    /// <summary>
-    /// Extension class to wrap configuration of CosmosDB
-    /// </summary>
-    public static class CosmosDbConfigurationExtensions
+    public static class ContainerBuilderExtensions
     {
         private const string DbConfigurationSection = "DbConfiguration";
 
@@ -27,12 +24,6 @@ namespace Eshopworld.Data.CosmosDb.Extensions
 
             builder.RegisterInstance(cosmosDbConfiguration);
             return builder;
-        }
-
-        private static bool HasCosmosEndpointAndKey(this CosmosDbConfiguration cosmosConfig)
-        {
-            return !string.IsNullOrEmpty(cosmosConfig.DatabaseEndpoint) &&
-                   !string.IsNullOrEmpty(cosmosConfig.DatabaseKey);
         }
     }
 }
