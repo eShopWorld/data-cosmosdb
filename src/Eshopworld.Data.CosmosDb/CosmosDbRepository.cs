@@ -69,7 +69,7 @@ namespace Eshopworld.Data.CosmosDb
             });
         }
 
-        public async Task<T> ReplaceAsync<T>(string id, T data, string etag)
+        public async Task<T> ReplaceAsync<T>(string id, T data, string etag = null)
         {
             return await ExecuteFunction(async () =>
             {
@@ -179,9 +179,9 @@ namespace Eshopworld.Data.CosmosDb
                 {
                     throw new MissingDocumentException();
                 }
-                catch (CosmosException ex)
+                catch (CosmosException exception)
                 {
-                    _bigBrother.Publish(ex.ToExceptionEvent());
+                    _bigBrother.Publish(exception);
                     throw;
                 }
         }
