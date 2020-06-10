@@ -41,3 +41,17 @@ public void ConfigureContainer(ContainerBuilder builder)
     builder.ConfigureCosmosDb(_configuration);
 }
 ```
+
+## Configuration
+
+Regardless of where your configuration is stored, this is the structure you need to have in place in 
+order to be able to correctly retrieve Cosmos DB settings.
+
+`CosmosDB:ConnectionString` holding a valid Cosmos DB connection string
+
+or
+
+`DbConfiguration:DatabaseEndpoint` Cosmos DB database endpoint
+`DbConfiguration:DatabaseKey` Cosmos DB database key
+`DbConfiguration:Throughput` Throughput (optional, defaults to 400 RUs)
+`DbConfiguration:DefaultTimeToLive` TTL (optional)
