@@ -11,11 +11,6 @@ namespace Eshopworld.Data.CosmosDb
     public interface ICosmosDbRepository
     {
         /// <summary>
-        /// Defines instance of a client for cosmos db
-        /// </summary>
-        CosmosClient DbClient { get; }
-
-        /// <summary>
         /// Defines the collection (and from which database) that should be used by the repository.
         /// </summary>
         /// <exception cref="ArgumentException">When the collection name or database id is incorrect</exception>

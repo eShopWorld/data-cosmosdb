@@ -34,7 +34,7 @@ namespace Eshopworld.Data.CosmosDb
                 UseCollection(collectionName, dbId);
         }
 
-        public CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup);
+        private CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup);
 
         public Container DbContainer => _container ??= DbClient.GetContainer(_databaseId, _containerName);
 
