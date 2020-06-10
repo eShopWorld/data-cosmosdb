@@ -3,15 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
-	<PackageIcon>icon.png</PackageIcon>
-    <Description>Cosmos DB CRUD functionality.</Description>
+	  <PackageIcon>icon.png</PackageIcon>
+    <Description>Cosmos DB CRUD functionality</Description>
     <Version>2.0.0</Version>
     <PackageReleaseNotes>New version</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>
     <IsPackable>True</IsPackable>
-    <Authors>Paul Mooney, David Guerin, Antonino Parisi</Authors>
+    <Authors>Darek Malinowski, Michal Szymczak, Antonino Parisi</Authors>
     <Company>eShopWorld</Company>
     <PackageLicenseUrl>https://github.com/eShopWorld/data-cosmosdb/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/eShopWorld/data-cosmosdb</PackageProjectUrl>
