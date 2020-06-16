@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eshopworld.Data.CosmosDb", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3FC28000-66E4-487A-9E8D-4A4F8146C418}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eshopworld.Data.CosmosDb.Tests", "Tests\Eshopworld.Data.CosmosDb.Tests\Eshopworld.Data.CosmosDb.Tests.csproj", "{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eshopworld.Data.CosmosDb.Tests", "Tests\Eshopworld.Data.CosmosDb.Tests\Eshopworld.Data.CosmosDb.Tests.csproj", "{0DBFBD5D-C034-4C86-A0D1-02CE0210922D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6EBAC030-B6CF-459F-AD48-09042B33B5EE}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
