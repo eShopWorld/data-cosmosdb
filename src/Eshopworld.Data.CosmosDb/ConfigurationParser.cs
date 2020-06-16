@@ -1,5 +1,4 @@
 ﻿using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using Eshopworld.Data.CosmosDb.Exceptions;
 using Microsoft.Extensions.Configuration;
 
@@ -11,20 +10,18 @@ namespace Eshopworld.Data.CosmosDb
     /// Will throw a <see cref="CosmosDbConfigurationException"/> if cannot correctly parse connection string
     /// </remarks>
     /// </summary>
-    public static class ConfigurationParser
+    internal static class ConfigurationParser
     {
-        private const string ConnectionStringKey = "CosmosDB:ConnectionString";
-
         private const string EndPointKey = "AccountEndpoint";
 
         private const string AccountKey = "AccountKey";
 
-        public static (string dbEndpoint, string dbKey) GetCosmosSettings(IConfiguration configuration, string connectionStringKey = ConnectionStringKey)
+        public static (string dbEndpoint, string dbKey) GetCosmosSettings(IConfiguration configuration, string connectionStringKey)
         {
             var connectionString = configuration[connectionStringKey];
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new CosmosDbConfigurationException("Missing connection string");
+                throw new CosmosDbConfigurationException($"Missing connection string for key '{connectionStringKey}'");
             }
 
             var connectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = connectionString };

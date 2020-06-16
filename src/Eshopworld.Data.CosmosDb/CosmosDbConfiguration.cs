@@ -5,9 +5,24 @@ namespace Eshopworld.Data.CosmosDb
 {
     public class CosmosDbConfiguration
     {
+        /// <summary>
+        /// Defines the URI for the cosmos DB account
+        /// </summary>
         public string DatabaseEndpoint { get; set; }
+
+        /// <summary>
+        /// Defines a key for the account
+        /// </summary>
         public string DatabaseKey { get; set; }
+
+        /// <summary>
+        /// Defines a throughput for the databases and collections
+        /// </summary>
         public int Throughput { get; set; } = 400;
+
+        /// <summary>
+        /// Defines TTL on database level
+        /// </summary>
         public int? DefaultTimeToLive { get; set; }
 
         /// <summary>
