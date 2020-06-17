@@ -46,43 +46,42 @@ namespace Eshopworld.Data.CosmosDb
             _databaseId = databaseId ?? _databaseId;
 
             if (_dbSetup.Databases[_databaseId].All(c => c.CollectionName != collectionName))
-                throw new ArgumentException(
-                    $"The collection '{collectionName}' is not configured for '{_databaseId}' database");
+                throw new ArgumentException($"The collection '{collectionName}' is not configured for '{_databaseId}' database");
 
             _containerName = collectionName;
         }
 
-        public async Task<DocumentContainer<T>> CreateAsync<T>(T data)
+        public async Task<T> CreateAsync<T>(T data)
         {
             return await ExecuteFunction(async () =>
             {
                 var response = await DbContainer.CreateItemAsync(data);
-                return MapResponse(response);
+                return response.Resource;
             });
         }
 
-        public async Task<DocumentContainer<T>> UpsertAsync<T>(T data)
+        public async Task<T> UpsertAsync<T>(T data)
         {
             return await ExecuteFunction(async () =>
             {
                 var response = await DbContainer.UpsertItemAsync(data);
-                return MapResponse(response);
+                return response.Resource;
             });
         }
 
-        public async Task<DocumentContainer<T>> ReplaceAsync<T>(string id, T data, string etag = null)
+        public async Task<T> ReplaceAsync<T>(string id, T data, string etag = null)
         {
             return await ExecuteFunction(async () =>
             {
                 var itemRequestOptions = etag != null
-                    ? new ItemRequestOptions {IfMatchEtag = etag}
+                    ? new ItemRequestOptions { IfMatchEtag = etag }
                     : null;
                 var response = await DbContainer.ReplaceItemAsync(
                     data,
                     id,
                     requestOptions: itemRequestOptions);
 
-                return MapResponse(response);
+                return response.Resource;
             });
         }
 
@@ -127,8 +126,7 @@ namespace Eshopworld.Data.CosmosDb
                     };
                 }
 
-                var iterator =
-                    DbContainer.GetItemQueryIterator<T>(cosmosQueryDef.QueryDefinition, null, requestOptions);
+                var iterator = DbContainer.GetItemQueryIterator<T>(cosmosQueryDef.QueryDefinition, null, requestOptions);
 
                 var items = new List<T>();
                 while (iterator.HasMoreResults)
@@ -144,6 +142,18 @@ namespace Eshopworld.Data.CosmosDb
         public Task<IEnumerable<T>> QueryAsync<T>(QueryDefinition queryDefinition, string partitionKey = null)
         {
             return QueryAsync<T>(new CosmosQuery(queryDefinition, partitionKey));
+        }
+
+        /// <summary>
+        /// Replaces existing document with given identifier with the provided data
+        /// </summary>
+        /// <typeparam name="T">Type of document data</typeparam>
+        /// <param name="id">Identifier of the document that is to be replaced</param>
+        /// <param name="data">New version of the document data</param>
+        /// <returns></returns>
+        public Task<T> ReplaceAsync<T>(string id, T data)
+        {
+            return ReplaceAsync(id, data, null);
         }
 
         public async Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(CosmosQuery cosmosQueryDef)
@@ -193,19 +203,13 @@ namespace Eshopworld.Data.CosmosDb
                 }
         }
 
-        private bool IsCollectionOrDatabaseMissing(CosmosException exception) =>
-            exception.StatusCode == HttpStatusCode.NotFound && exception.Message.Contains("ResourceType: Collection");
+        private bool IsCollectionOrDatabaseMissing(CosmosException exception) => exception.StatusCode == HttpStatusCode.NotFound && exception.Message.Contains("ResourceType: Collection");
 
         private void InvalidateClient()
         {
             _dbClient = null;
             _container = null;
             _clientFactory.Invalidate();
-        }
-
-        private static DocumentContainer<T> MapResponse<T>(ItemResponse<T> response)
-        {
-            return new DocumentContainer<T>(response.Resource, response.ETag);
         }
     }
 }

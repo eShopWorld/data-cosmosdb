@@ -21,16 +21,16 @@ namespace Eshopworld.Data.CosmosDb
         /// </summary>
         /// <typeparam name="T">Type of the document data</typeparam>
         /// <param name="data">Document data</param>
-        /// <returns>An instance of <see cref="DocumentContainer{TDoc}"/></returns>
-        Task<DocumentContainer<T>> CreateAsync<T>(T data);
+        /// <returns>Generic instance of the newly created document</returns>
+        Task<T> CreateAsync<T>(T data);
 
         /// <summary>
         /// Creates or replaces existing document in the database
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
-        /// <returns>An instance of <see cref="DocumentContainer{TDoc}"/></returns>
-        Task<DocumentContainer<T>> UpsertAsync<T>(T data);
+        /// <returns></returns>
+        Task<T> UpsertAsync<T>(T data);
 
         /// <summary>
         /// Replaces existing document with given identifier with the provided data
@@ -41,9 +41,9 @@ namespace Eshopworld.Data.CosmosDb
         /// <param name="id">Identifier of the document that is to be replaced</param>
         /// <param name="data">New version of the document data</param>
         /// <param name="etag">Optional - matching etag condition for the update to take place</param>
-        /// <returns>An instance of <see cref="DocumentContainer{TDoc}"/></returns>
+        /// <returns></returns>
         /// <exception cref="StaleDataException">When provided etag does not match the one record in the document being updated</exception>
-        Task<DocumentContainer<T>> ReplaceAsync<T>(string id, T data, string etag = null);
+        Task<T> ReplaceAsync<T>(string id, T data, string etag);
 
         /// <summary>
         /// Deletes a document with a given identifier

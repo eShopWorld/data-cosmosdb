@@ -29,10 +29,9 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 DatabaseKey = string.Empty,
                 Databases = new Dictionary<string, CosmosDbCollectionSettings[]>()
                 {
-                    [string.Empty] = new CosmosDbCollectionSettings[]
-                    {
-                        new CosmosDbCollectionSettings(string.Empty)
-                    }
+                   [string.Empty] = new CosmosDbCollectionSettings[] {
+                       new CosmosDbCollectionSettings(string.Empty)
+                   }
                 }
             };
 
@@ -53,6 +52,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 .Verifiable();
 
             _repository = new CosmosDbRepository(configuration, clientFactoryMock.Object, bigBrother);
+
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
             // Assert
             using (new AssertionScope())
             {
-                result.Document.Should().BeSameAs(testData);
+                result.Should().BeSameAs(testData);
                 _containerMock.Verify();
             }
         }
@@ -100,7 +100,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
             // Assert
             using (new AssertionScope())
             {
-                result.Document.Should().BeSameAs(testData);
+                result.Should().BeSameAs(testData);
                 _containerMock.Verify();
             }
         }
@@ -125,7 +125,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
             // Assert
             using (new AssertionScope())
             {
-                result.Document.Should().BeSameAs(testData);
+                result.Should().BeSameAs(testData);
                 _containerMock.Verify();
             }
         }
@@ -184,9 +184,10 @@ namespace Eshopworld.Data.CosmosDb.Tests
         [IsUnit]
         public async Task CanQueryItem()
         {
+
             // Arrange
             var testData = new TestData();
-            var testList = new List<TestData> {testData, testData};
+            var testList = new List<TestData> { testData, testData };
 
             var query = new CosmosQuery("select * from aCollection");
             var feedIteratorMock = new Mock<FeedIterator<TestData>>();
@@ -268,6 +269,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 _containerMock.Verify();
             }
         }
+
     }
 
     public class TestData
@@ -275,4 +277,5 @@ namespace Eshopworld.Data.CosmosDb.Tests
         public string Id { get; set; } = "my_id";
         public string Pk { get; set; } = "my_pk";
     }
+
 }
