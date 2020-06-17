@@ -5,7 +5,7 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <PackageReleaseNotes>- Fixed https://github.com/eShopWorld/data-cosmosdb/issues/9#issue-640535803</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
