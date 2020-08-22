@@ -41,6 +41,11 @@ namespace Eshopworld.Data.CosmosDb
 
         public CosmosDbRepository UseCosmosClientOptions(CosmosClientOptions clientOptions)
         {
+            if(_dbClient != null)
+            {
+                InvalidateClient();
+            }
+
             _clientOptions = clientOptions;
 
             return this;
