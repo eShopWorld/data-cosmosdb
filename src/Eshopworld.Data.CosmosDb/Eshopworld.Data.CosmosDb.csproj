@@ -5,8 +5,8 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.0.2</Version>
-    <PackageReleaseNotes>Upgrade of dependency packages.</PackageReleaseNotes>
+    <Version>3.0.3-preview1</Version>
+    <PackageReleaseNotes>Enable CosmosClient options.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>

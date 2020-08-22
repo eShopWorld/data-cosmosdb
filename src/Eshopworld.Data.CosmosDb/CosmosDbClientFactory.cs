@@ -20,7 +20,7 @@ namespace Eshopworld.Data.CosmosDb
             _bb = bb ?? throw new ArgumentNullException(nameof(bb));
         }
 
-        public CosmosClient InitialiseClient(CosmosDbConfiguration config)
+        public CosmosClient InitialiseClient(CosmosDbConfiguration config, CosmosClientOptions clientOptions = null)
         {
             if (_client != null) return _client;
 
@@ -32,7 +32,7 @@ namespace Eshopworld.Data.CosmosDb
             {
                 if (_client != null) return _client;
 
-                var client = new CosmosClient(config.DatabaseEndpoint, config.DatabaseKey);
+                var client = new CosmosClient(config.DatabaseEndpoint, config.DatabaseKey, clientOptions);
                 foreach (var (databaseName, containerSettings) in config.Databases)
                 {
                     CreateDatabaseIfNotExistsAsync(config, client, databaseName, containerSettings).Wait();

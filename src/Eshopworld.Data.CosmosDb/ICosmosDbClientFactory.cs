@@ -10,8 +10,9 @@ namespace Eshopworld.Data.CosmosDb
         /// When calling for already cached client, the settings has no effect and previously cached version is returned.
         /// </summary>
         /// <param name="config">Database and collection settings</param>
+        /// <param name="clientOptions">Cosmos DB client options </param>
         /// <returns>Instance of a db client</returns>
-        CosmosClient InitialiseClient(CosmosDbConfiguration config);
+        CosmosClient InitialiseClient(CosmosDbConfiguration config, CosmosClientOptions clientOptions);
 
         /// <summary>
         /// If any client is cached, this will invalidate (dispose) the client connection and subsequent call to InitialiseClient
