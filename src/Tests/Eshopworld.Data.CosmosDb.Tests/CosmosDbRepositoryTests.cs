@@ -48,7 +48,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
 
             var clientFactoryMock = new Mock<ICosmosDbClientFactory>();
             clientFactoryMock
-                .Setup(x => x.InitialiseClient(configuration))
+                .Setup(x => x.InitialiseClient(configuration, null))
                 .Returns(clientMock.Object)
                 .Verifiable();
 
