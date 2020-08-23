@@ -39,7 +39,7 @@ namespace Eshopworld.Data.CosmosDb
 
         public Container DbContainer => _container ??= DbClient.GetContainer(_databaseId, _containerName);
 
-        public CosmosDbRepository UseCosmosClientOptions(CosmosClientOptions clientOptions)
+        public ICosmosDbRepository UseCosmosClientOptions(CosmosClientOptions clientOptions)
         {
             if(_dbClient != null)
             {
@@ -51,7 +51,7 @@ namespace Eshopworld.Data.CosmosDb
             return this;
         }
 
-        public CosmosDbRepository UseCollection(string collectionName, string databaseId = null)
+        public ICosmosDbRepository UseCollection(string collectionName, string databaseId = null)
         {
             if (databaseId != null && !_dbSetup.Databases.ContainsKey(databaseId))
                 throw new ArgumentException($"The database id '{databaseId}' is not configured");
