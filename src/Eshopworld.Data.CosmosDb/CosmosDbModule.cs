@@ -18,7 +18,8 @@ namespace Eshopworld.Data.CosmosDb
                 .SingleInstance();
 
             builder.RegisterType<CosmosDbRepository>()
-                .As<ICosmosDbRepository>();
+                .As<ICosmosDbRepository>()
+                .PropertiesAutowired();
         }
     }
 }
