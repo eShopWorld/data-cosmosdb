@@ -20,6 +20,16 @@ namespace Eshopworld.Data.CosmosDb
 
         private CosmosClient _dbClient;
         private Container _container;
+        private CosmosClientOptions _cosmosClientOptions = null;
+
+        public CosmosClientOptions CosmosClientOptions 
+        { 
+            set
+            {
+                _cosmosClientOptions = value;
+                InvalidateClient();
+            }
+        }
 
         public CosmosDbRepository(
             CosmosDbConfiguration setup,
@@ -34,7 +44,7 @@ namespace Eshopworld.Data.CosmosDb
                 UseCollection(collectionName, dbId);
         }
 
-        private CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup);
+        private CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup, _cosmosClientOptions);
 
         public Container DbContainer => _container ??= DbClient.GetContainer(_databaseId, _containerName);
 

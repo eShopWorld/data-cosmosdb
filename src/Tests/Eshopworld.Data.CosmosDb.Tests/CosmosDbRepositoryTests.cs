@@ -19,6 +19,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
         private readonly CosmosDbRepository _repository;
         private readonly Mock<ItemResponse<TestData>> _responseMock;
         private readonly Mock<Container> _containerMock;
+        private readonly Mock<ICosmosDbClientFactory> _clientFactoryMock;
 
         public CosmosDbRepositoryTests()
         {
@@ -46,13 +47,28 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 .Returns(_containerMock.Object)
                 .Verifiable();
 
-            var clientFactoryMock = new Mock<ICosmosDbClientFactory>();
-            clientFactoryMock
-                .Setup(x => x.InitialiseClient(configuration))
+            _clientFactoryMock = new Mock<ICosmosDbClientFactory>();
+            _clientFactoryMock
+                .Setup(x => x.InitialiseClient(configuration, It.IsAny<CosmosClientOptions>()))
                 .Returns(clientMock.Object)
                 .Verifiable();
 
-            _repository = new CosmosDbRepository(configuration, clientFactoryMock.Object, bigBrother);
+            _repository = new CosmosDbRepository(configuration, _clientFactoryMock.Object, bigBrother);
+        }
+
+        [Fact]
+        [IsUnit]
+        public void WhenCosmosClientOptionsIsSet_ThenFactoryInitialiseClientIsCalled()
+        {
+            // Arrange
+            var options = new CosmosClientOptions();
+
+            // Act
+            _repository.CosmosClientOptions = options;
+            var dbContainer = _repository.DbContainer;
+
+            // Assert
+            _clientFactoryMock.Verify(x => x.InitialiseClient(It.IsAny<CosmosDbConfiguration>(), options));
         }
 
         [Fact]
