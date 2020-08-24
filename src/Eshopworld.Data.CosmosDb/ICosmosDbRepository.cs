@@ -14,13 +14,7 @@ namespace Eshopworld.Data.CosmosDb
         /// Defines the collection (and from which database) that should be used by the repository.
         /// </summary>
         /// <exception cref="ArgumentException">When the collection name or database id is incorrect</exception>
-        ICosmosDbRepository UseCollection(string collectionName, string databaseId = null);
-
-        /// <summary>
-        /// Defines the CosmosClient options for this client.
-        /// </summary>
-        /// <exception cref="ArgumentException">When the collection name or database id is incorrect</exception>
-        ICosmosDbRepository UseCosmosClientOptions(CosmosClientOptions clientOptions);
+        void UseCollection(string collectionName, string databaseId = null);
 
         /// <summary>
         /// Creates new instance of a document in the database.

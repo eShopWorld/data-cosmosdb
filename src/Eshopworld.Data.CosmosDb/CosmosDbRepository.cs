@@ -20,7 +20,8 @@ namespace Eshopworld.Data.CosmosDb
 
         private CosmosClient _dbClient;
         private Container _container;
-        private CosmosClientOptions _clientOptions = null;
+
+        public CosmosClientOptions CosmosClientOptions { get; set; }
 
         public CosmosDbRepository(
             CosmosDbConfiguration setup,
@@ -35,23 +36,11 @@ namespace Eshopworld.Data.CosmosDb
                 UseCollection(collectionName, dbId);
         }
 
-        private CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup, _clientOptions);
+        private CosmosClient DbClient => _dbClient ??= _clientFactory.InitialiseClient(_dbSetup, CosmosClientOptions);
 
         public Container DbContainer => _container ??= DbClient.GetContainer(_databaseId, _containerName);
 
-        public ICosmosDbRepository UseCosmosClientOptions(CosmosClientOptions clientOptions)
-        {
-            if(_dbClient != null)
-            {
-                InvalidateClient();
-            }
-
-            _clientOptions = clientOptions;
-
-            return this;
-        }
-
-        public ICosmosDbRepository UseCollection(string collectionName, string databaseId = null)
+        public void UseCollection(string collectionName, string databaseId = null)
         {
             if (databaseId != null && !_dbSetup.Databases.ContainsKey(databaseId))
                 throw new ArgumentException($"The database id '{databaseId}' is not configured");
@@ -63,8 +52,6 @@ namespace Eshopworld.Data.CosmosDb
                     $"The collection '{collectionName}' is not configured for '{_databaseId}' database");
 
             _containerName = collectionName;
-
-            return this;
         }
 
         public async Task<DocumentContainer<T>> CreateAsync<T>(T data)
