@@ -80,7 +80,7 @@ namespace Eshopworld.Data.CosmosDb
 
             lock (_sync)
             {
-                _client.Dispose();
+                _client?.Dispose();
                 _client = null;
             }
         }
