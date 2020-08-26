@@ -20,25 +20,18 @@ namespace Eshopworld.Data.CosmosDb
 
         private CosmosClient _dbClient;
         private Container _container;
-        private CosmosClientOptions _cosmosClientOptions = null;
-
-        public CosmosClientOptions CosmosClientOptions 
-        { 
-            set
-            {
-                _cosmosClientOptions = value;
-                InvalidateClient();
-            }
-        }
-
+        private CosmosClientOptions _cosmosClientOptions;
+        
         public CosmosDbRepository(
             CosmosDbConfiguration setup,
             ICosmosDbClientFactory factory,
-            IBigBrother bigBrother)
+            IBigBrother bigBrother,
+            CosmosClientOptions cosmosClientOptions = null)
         {
             _dbSetup = setup ?? throw new ArgumentNullException(nameof(setup));
             _clientFactory = factory ?? throw new ArgumentNullException(nameof(factory));
             _bigBrother = bigBrother ?? throw new ArgumentNullException(nameof(bigBrother));
+            _cosmosClientOptions = cosmosClientOptions;
 
             if (_dbSetup.TryGetDefaults(out var dbId, out var collectionName))
                 UseCollection(collectionName, dbId);
