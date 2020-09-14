@@ -1,10 +1,12 @@
-﻿using Autofac;
+﻿using System.Diagnostics.CodeAnalysis;
+using Autofac;
 
 namespace Eshopworld.Data.CosmosDb
 {
     /// <summary>
     /// Module for dependencies in the repository
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class CosmosDbModule : Module
     {
         /// <summary>
