@@ -33,7 +33,7 @@ namespace Eshopworld.Data.CosmosDb
 
         public bool TryGetDefaults(out string databaseId, out string collectionName)
         {
-            var defaults = Databases.FirstOrDefault();
+            var defaults = Databases?.FirstOrDefault() ?? new KeyValuePair<string, CosmosDbCollectionSettings[]>();
             if (defaults.Key != null && defaults.Value != null && defaults.Value.Any())
             {
                 databaseId = defaults.Key;
