@@ -25,6 +25,16 @@ namespace Eshopworld.Data.CosmosDb.Tests
         }
 
         [Fact, IsUnit]
+        public void Constructor_BigBrotherNull_ThrowsException()
+        {
+            // Act
+            Func<CosmosDbClientFactory> func = () => new CosmosDbClientFactory(null);
+
+            // Assert
+            func.Should().ThrowExactly<ArgumentNullException>();
+        }
+
+        [Fact, IsUnit]
         public void Invalidate_CallForInvalidationWithNoClient_CompletesSuccessfully()
         {
             // Act

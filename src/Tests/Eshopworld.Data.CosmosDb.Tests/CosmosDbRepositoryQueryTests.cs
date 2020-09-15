@@ -73,6 +73,21 @@ namespace Eshopworld.Data.CosmosDb.Tests
         }
 
         [Fact, IsUnit]
+        public async Task QueryAsync_ValidRequestWithPartitionKey_ReturnsExpectedData()
+        {
+            // Arrange
+            var expectedQueryResult = new List<TestData> { new TestData(), new TestData() };
+            var query = new CosmosQuery("select * from aCollection", "partition-key");
+            SetUpItemQueryIteratorWithResult(expectedQueryResult);
+
+            // Act
+            var result = await _repository.QueryAsync<TestData>(query);
+
+            // Assert
+            result.Should().BeEquivalentTo(expectedQueryResult);
+        }
+
+        [Fact, IsUnit]
         public async Task QueryAsync_QueryDefinitionProvided_CanQuerySuccessfully()
         {
             // Arrange
@@ -210,7 +225,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
         {
             var feedIteratorMock = new Mock<FeedIterator<T>>();
             _containerMock
-                .Setup(x => x.GetItemQueryIterator<T>(It.IsAny<QueryDefinition>(), null, null))
+                .Setup(x => x.GetItemQueryIterator<T>(It.IsAny<QueryDefinition>(), null, It.IsAny<QueryRequestOptions>()))
                 .Returns(feedIteratorMock.Object);
 
             var feedResponseMock = new Mock<FeedResponse<T>>();
