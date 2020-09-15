@@ -1,5 +1,9 @@
-﻿namespace Eshopworld.Data.CosmosDb
+﻿using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
+
+namespace Eshopworld.Data.CosmosDb
 {
+    [ExcludeFromCodeCoverage]
     public class CosmosDbCollectionSettings
     {
         /// <summary>
@@ -18,7 +22,11 @@
         public string[] UniqueKeys { get; set; }
 
         // default constructor needed
-        public CosmosDbCollectionSettings () : this (null) { }
+        [UsedImplicitly]
+        public CosmosDbCollectionSettings(): this(null)
+        {
+        }
+
         public CosmosDbCollectionSettings (string collectionName)
         {
             CollectionName = collectionName;
