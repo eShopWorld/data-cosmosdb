@@ -6,6 +6,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -278,6 +279,29 @@ namespace Eshopworld.Data.CosmosDb.Tests
 
             // Assert
             func.Should().ThrowExactly<CosmosException>().Which.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+        }
+
+        [Fact, IsUnit]
+        public async Task GetByIdAsync_ValidRequest_RetrievesItem()
+        {
+            // Arrange
+            var expectedItem = new TestData();
+            var id = "id";
+            var collectionPartitionKey = "partitionKey";
+            var partitionKey = new PartitionKey(collectionPartitionKey);
+
+            _responseMock
+                .SetupGet(x => x.Resource)
+                .Returns(expectedItem);
+            _containerMock
+                .Setup(x => x.ReadItemAsync<TestData>(id, partitionKey, It.IsAny<ItemRequestOptions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_responseMock.Object);
+
+            // Act
+            var result = await _repository.GetByIdAsync<TestData>(id, collectionPartitionKey);
+
+            // Assert
+            result.Document.Should().BeSameAs(expectedItem);
         }
     }
 }

@@ -69,5 +69,14 @@ namespace Eshopworld.Data.CosmosDb
         /// <param name="cosmosQueryDef">Query definition</param>
         /// <returns>Collection of documents matching given query with extended meta-data for each document</returns>
         Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(CosmosQuery cosmosQueryDef);
+
+        /// <summary>
+        /// Returns a document by the given identifier
+        /// </summary>
+        /// <typeparam name="T">Type of document data</typeparam>
+        /// <param name="id">The identifier of the document</param>
+        /// <param name="partitionKey"></param>
+        /// <returns></returns>
+        Task<DocumentContainer<T>> GetByIdAsync<T>(string id, string partitionKey);
     }
 }
