@@ -117,6 +117,16 @@ namespace Eshopworld.Data.CosmosDb
             return QueryInternalAsync<T>(cosmosQueryDef);
         }
 
+        public async Task<DocumentContainer<T>> GetByIdAsync<T>(string id, string partitionKey)
+        {
+            return await ExecuteFunction(async () =>
+            {
+               var itemResponse = await DbContainer.ReadItemAsync<T>(id, new PartitionKey(partitionKey));
+
+               return MapResponse(itemResponse);
+            });
+        }
+
         private async Task<IEnumerable<T>> QueryInternalAsync<T>(CosmosQuery cosmosQueryDef)
         {
             return await ExecuteFunction(async () =>

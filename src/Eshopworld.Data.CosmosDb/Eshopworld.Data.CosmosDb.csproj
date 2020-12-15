@@ -5,8 +5,8 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.0.4</Version>
-    <PackageReleaseNotes>Enable CosmosClient options.</PackageReleaseNotes>
+    <Version>3.0.5</Version>
+    <PackageReleaseNotes>Added Get By Id method.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>
