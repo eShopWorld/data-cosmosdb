@@ -44,7 +44,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 .Setup(x => x.InitialiseClient(configuration, It.IsAny<CosmosClientOptions>()))
                 .Returns(clientMock.Object);
 
-            _repository = new CosmosDbRepository(configuration, _clientFactoryMock.Object, Mock.Of<IBigBrother>());
+            _repository = new CosmosDbRepository(configuration, _clientFactoryMock.Object);
         }
 
         [Fact, IsUnit]

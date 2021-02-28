@@ -1,5 +1,4 @@
-﻿using Eshopworld.Core;
-using Eshopworld.Data.CosmosDb.Exceptions;
+﻿using Eshopworld.Data.CosmosDb.Exceptions;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json.Linq;
 using System;
@@ -13,7 +12,6 @@ namespace Eshopworld.Data.CosmosDb
     public class CosmosDbRepository : ICosmosDbRepository
     {
         private readonly ICosmosDbClientFactory _clientFactory;
-        private readonly IBigBrother _bigBrother;
         private readonly CosmosDbConfiguration _dbSetup;
         private string _databaseId;
         private string _containerName;
@@ -25,12 +23,10 @@ namespace Eshopworld.Data.CosmosDb
         public CosmosDbRepository(
             CosmosDbConfiguration setup,
             ICosmosDbClientFactory factory,
-            IBigBrother bigBrother,
             CosmosClientOptions cosmosClientOptions = null)
         {
             _dbSetup = setup ?? throw new ArgumentNullException(nameof(setup));
             _clientFactory = factory ?? throw new ArgumentNullException(nameof(factory));
-            _bigBrother = bigBrother ?? throw new ArgumentNullException(nameof(bigBrother));
             _cosmosClientOptions = cosmosClientOptions;
 
             if (_dbSetup.TryGetDefaults(out var dbId, out var collectionName))
@@ -199,9 +195,8 @@ namespace Eshopworld.Data.CosmosDb
                 {
                     throw new MissingDocumentException();
                 }
-                catch (CosmosException exception)
+                catch (CosmosException)
                 {
-                    _bigBrother.Publish(exception);
                     throw;
                 }
         }

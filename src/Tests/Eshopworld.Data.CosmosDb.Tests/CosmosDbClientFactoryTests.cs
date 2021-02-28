@@ -12,13 +12,13 @@ namespace Eshopworld.Data.CosmosDb.Tests
 {
     public class CosmosDbClientFactoryTests
     {
-        private readonly CosmosDbClientFactory _factory = new CosmosDbClientFactory(Mock.Of<IBigBrother>());
+        private readonly CosmosDbClientFactory _factory = new CosmosDbClientFactory();
 
         [Fact, IsUnit]
         public void Constructor_InitializesInstance()
         {
             // Act
-            var instance = new CosmosDbClientFactory(Mock.Of<IBigBrother>());
+            var instance = new CosmosDbClientFactory();
 
             // Assert
             instance.Should().NotBeNull();
@@ -28,7 +28,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
         public void Constructor_BigBrotherNull_ThrowsException()
         {
             // Act
-            Func<CosmosDbClientFactory> func = () => new CosmosDbClientFactory(null);
+            Func<CosmosDbClientFactory> func = () => new CosmosDbClientFactory();
 
             // Assert
             func.Should().ThrowExactly<ArgumentNullException>();

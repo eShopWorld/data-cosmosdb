@@ -1,6 +1,4 @@
-﻿using Eshopworld.Core;
-using Eshopworld.Data.CosmosDb.Telemetry;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +9,12 @@ namespace Eshopworld.Data.CosmosDb
     public class CosmosDbClientFactory : ICosmosDbClientFactory, IDisposable
     {
         private readonly object _sync = new object();
-        private readonly IBigBrother _bb;
 
         private CosmosClient _client;
-
-        public CosmosDbClientFactory(IBigBrother bb)
-        {
-            _bb = bb ?? throw new ArgumentNullException(nameof(bb));
-        }
 
         public CosmosClient InitialiseClient(CosmosDbConfiguration config, CosmosClientOptions clientOptions = null)
         {
             if (_client != null) return _client;
-
-            LogEvent("Initialising Cosmos DB client");
 
             ValidateConfiguration(config);
 
@@ -39,8 +29,6 @@ namespace Eshopworld.Data.CosmosDb
                 }
 
                 _client = client;
-
-                LogEvent("Cosmos Db Client initialisation completed");
             }
 
             return _client;
@@ -76,8 +64,6 @@ namespace Eshopworld.Data.CosmosDb
 
         public void Invalidate()
         {
-            LogEvent("Invalidating Cosmos Db Client");
-
             lock (_sync)
             {
                 _client?.Dispose();
@@ -108,8 +94,6 @@ namespace Eshopworld.Data.CosmosDb
 
             var invalidDb = config.Databases.Where(kv => kv.Value == null || !kv.Value.Any()).Select(kv => kv.Key).FirstOrDefault();
             if (invalidDb != null) throw new ArgumentException($"The database '{invalidDb}' has no collections defined");
-
-            LogEvent("Configuration verified");
         }
 
         private static UniqueKeyPolicy GetUniqueKeyPolicy(CosmosDbCollectionSettings container)
@@ -128,11 +112,6 @@ namespace Eshopworld.Data.CosmosDb
             }
 
             return uniqueKeyPolicy;
-        }
-
-        private void LogEvent(string message)
-        {
-            _bb.Publish(new CosmosDbClientFactoryEvent(message));
         }
     }
 }

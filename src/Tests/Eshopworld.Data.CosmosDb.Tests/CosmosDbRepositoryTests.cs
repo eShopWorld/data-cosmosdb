@@ -18,7 +18,6 @@ namespace Eshopworld.Data.CosmosDb.Tests
         private readonly Mock<ItemResponse<TestData>> _responseMock = new Mock<ItemResponse<TestData>>();
         private readonly Mock<Container> _containerMock = new Mock<Container>();
         private readonly Mock<ICosmosDbClientFactory> _clientFactoryMock;
-        private readonly IBigBrother _bigBrother = Mock.Of<IBigBrother>();
         private readonly CosmosDbConfiguration _configuration;
 
         public CosmosDbRepositoryTests()
@@ -46,7 +45,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 .Setup(x => x.InitialiseClient(_configuration, It.IsAny<CosmosClientOptions>()))
                 .Returns(clientMock.Object);
 
-            _repository = new CosmosDbRepository(_configuration, _clientFactoryMock.Object, _bigBrother);
+            _repository = new CosmosDbRepository(_configuration, _clientFactoryMock.Object);
         }
 
         [Fact, IsUnit]
@@ -55,8 +54,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
             // Act
             Func<CosmosDbRepository> func = () => new CosmosDbRepository(
                 null,
-                Mock.Of<ICosmosDbClientFactory>(),
-                Mock.Of<IBigBrother>());
+                Mock.Of<ICosmosDbClientFactory>());
 
             // Assert
             func.Should().ThrowExactly<ArgumentNullException>();
@@ -68,8 +66,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
             // Act
             Func<CosmosDbRepository> func = () => new CosmosDbRepository(
                 _configuration,
-                null,
-                Mock.Of<IBigBrother>());
+                null);
 
             // Assert
             func.Should().ThrowExactly<ArgumentNullException>();
@@ -95,7 +92,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
             var options = new CosmosClientOptions();
 
             // Act
-            var cosmosRepository = new CosmosDbRepository(_configuration, _clientFactoryMock.Object, _bigBrother, options);
+            var cosmosRepository = new CosmosDbRepository(_configuration, _clientFactoryMock.Object, options);
             var _ = cosmosRepository.DbContainer;
 
             // Assert
@@ -106,7 +103,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
         public void UseCollection_DatabaseNotConfigured_ThrowsException()
         {
             // Arrange
-            var cosmosRepository = new CosmosDbRepository(_configuration, _clientFactoryMock.Object, _bigBrother, new CosmosClientOptions());
+            var cosmosRepository = new CosmosDbRepository(_configuration, _clientFactoryMock.Object, new CosmosClientOptions());
 
             // Act
             Action action = () => cosmosRepository.UseCollection("abc", "db1");
@@ -129,7 +126,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                     ["db1"] = new[] { new CosmosDbCollectionSettings(string.Empty) }
                 }
             };
-            var cosmosRepository = new CosmosDbRepository(config, _clientFactoryMock.Object, _bigBrother, new CosmosClientOptions());
+            var cosmosRepository = new CosmosDbRepository(config, _clientFactoryMock.Object, new CosmosClientOptions());
             
             // Act
             Action action = () => cosmosRepository.UseCollection("col1", "db1");
@@ -152,7 +149,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                     ["db1"] = new[] { new CosmosDbCollectionSettings("col1") }
                 }
             };
-            var cosmosRepository = new CosmosDbRepository(config, _clientFactoryMock.Object, _bigBrother, new CosmosClientOptions());
+            var cosmosRepository = new CosmosDbRepository(config, _clientFactoryMock.Object, new CosmosClientOptions());
 
             // Act
             Action action = () => cosmosRepository.UseCollection("col1", "db1");
