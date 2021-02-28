@@ -5,17 +5,17 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.0.5</Version>
-    <PackageReleaseNotes>Added Get By Id method.</PackageReleaseNotes>
+    <Version>3.0.6</Version>
+    <PackageReleaseNotes>Update dependecies.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>
     <IsPackable>True</IsPackable>
     <Authors>Darek Malinowski, Michal Szymczak, Antonino Parisi</Authors>
-    <Company>eShopWorld</Company>
+    <Company>ESW</Company>
     <PackageLicenseUrl>https://github.com/eShopWorld/data-cosmosdb/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/eShopWorld/data-cosmosdb</PackageProjectUrl>
-    <Copyright>Copyright 2020</Copyright>
+    <Copyright>Copyright 2021</Copyright>
     <PackageTags>Eshopworld, Caching, CosmosDB, Azure</PackageTags>
   </PropertyGroup>
 
@@ -24,9 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Eshopworld.Core" Version="4.1.6" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.12.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+    <PackageReference Include="Eshopworld.Core" Version="4.2.1" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.16.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
