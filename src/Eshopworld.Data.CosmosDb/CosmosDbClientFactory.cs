@@ -1,6 +1,5 @@
-﻿using Eshopworld.Core;
-using Eshopworld.Data.CosmosDb.Telemetry;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +10,20 @@ namespace Eshopworld.Data.CosmosDb
     public class CosmosDbClientFactory : ICosmosDbClientFactory, IDisposable
     {
         private readonly object _sync = new object();
-        private readonly IBigBrother _bb;
+        private readonly ILogger<CosmosDbClientFactory> _logger;
 
         private CosmosClient _client;
 
-        public CosmosDbClientFactory(IBigBrother bb)
+        public CosmosDbClientFactory(ILogger<CosmosDbClientFactory> logger = null)
         {
-            _bb = bb ?? throw new ArgumentNullException(nameof(bb));
+            _logger = logger;
         }
 
         public CosmosClient InitialiseClient(CosmosDbConfiguration config, CosmosClientOptions clientOptions = null)
         {
             if (_client != null) return _client;
 
-            LogEvent("Initialising Cosmos DB client");
+            _logger?.LogDebug("Initialising Cosmos DB client");
 
             ValidateConfiguration(config);
 
@@ -40,7 +39,7 @@ namespace Eshopworld.Data.CosmosDb
 
                 _client = client;
 
-                LogEvent("Cosmos Db Client initialisation completed");
+                _logger?.LogDebug("Cosmos Db Client initialisation completed");
             }
 
             return _client;
@@ -76,7 +75,7 @@ namespace Eshopworld.Data.CosmosDb
 
         public void Invalidate()
         {
-            LogEvent("Invalidating Cosmos Db Client");
+            _logger?.LogDebug("Invalidating Cosmos Db Client");
 
             lock (_sync)
             {
@@ -109,7 +108,7 @@ namespace Eshopworld.Data.CosmosDb
             var invalidDb = config.Databases.Where(kv => kv.Value == null || !kv.Value.Any()).Select(kv => kv.Key).FirstOrDefault();
             if (invalidDb != null) throw new ArgumentException($"The database '{invalidDb}' has no collections defined");
 
-            LogEvent("Configuration verified");
+            _logger?.LogDebug("Configuration verified");
         }
 
         private static UniqueKeyPolicy GetUniqueKeyPolicy(CosmosDbCollectionSettings container)
@@ -128,11 +127,6 @@ namespace Eshopworld.Data.CosmosDb
             }
 
             return uniqueKeyPolicy;
-        }
-
-        private void LogEvent(string message)
-        {
-            _bb.Publish(new CosmosDbClientFactoryEvent(message));
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
 
 namespace Eshopworld.Data.CosmosDb
 {
@@ -22,7 +21,6 @@ namespace Eshopworld.Data.CosmosDb
         public string[] UniqueKeys { get; set; }
 
         // default constructor needed
-        [UsedImplicitly]
         public CosmosDbCollectionSettings(): this(null)
         {
         }

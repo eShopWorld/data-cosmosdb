@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using Eshopworld.Core;
 using Eshopworld.Tests.Core;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -12,26 +11,26 @@ namespace Eshopworld.Data.CosmosDb.Tests
 {
     public class CosmosDbClientFactoryTests
     {
-        private readonly CosmosDbClientFactory _factory = new CosmosDbClientFactory(Mock.Of<IBigBrother>());
+        private readonly CosmosDbClientFactory _factory = new CosmosDbClientFactory(Mock.Of<ILogger<CosmosDbClientFactory>>());
 
         [Fact, IsUnit]
         public void Constructor_InitializesInstance()
         {
             // Act
-            var instance = new CosmosDbClientFactory(Mock.Of<IBigBrother>());
+            var instance = new CosmosDbClientFactory(Mock.Of<ILogger<CosmosDbClientFactory>>());
 
             // Assert
             instance.Should().NotBeNull();
         }
 
         [Fact, IsUnit]
-        public void Constructor_BigBrotherNull_ThrowsException()
+        public void Constructor_BigBrotherNull_DoesNotThrowException()
         {
             // Act
             Func<CosmosDbClientFactory> func = () => new CosmosDbClientFactory(null);
 
             // Assert
-            func.Should().ThrowExactly<ArgumentNullException>();
+            func.Should().NotThrow();
         }
 
         [Fact, IsUnit]

@@ -5,8 +5,8 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.0.6</Version>
-    <PackageReleaseNotes>Update dependecies.</PackageReleaseNotes>
+    <Version>3.1.0</Version>
+    <PackageReleaseNotes>Remove BigBrother dependency, use ILogger optional dependency.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>
@@ -25,8 +25,9 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
-    <PackageReference Include="Eshopworld.Core" Version="4.2.1" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.16.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
