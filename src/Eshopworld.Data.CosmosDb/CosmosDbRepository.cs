@@ -15,13 +15,13 @@ namespace Eshopworld.Data.CosmosDb
         private readonly ICosmosDbClientFactory _clientFactory;
         private readonly ILogger<CosmosDbRepository> _logger;
         private readonly CosmosDbConfiguration _dbSetup;
-        private string _databaseId;
-        private string _containerName;
+        private readonly CosmosClientOptions _cosmosClientOptions;
 
         private CosmosClient _dbClient;
         private Container _container;
-        private CosmosClientOptions _cosmosClientOptions;
-        
+        private string _databaseId;
+        private string _containerName;
+
         public CosmosDbRepository(
             CosmosDbConfiguration setup,
             ICosmosDbClientFactory factory,
@@ -117,14 +117,9 @@ namespace Eshopworld.Data.CosmosDb
             return QueryInternalAsync<T>(cosmosQueryDef);
         }
 
-        public async Task<DocumentContainer<T>> GetByIdAsync<T>(string id, string partitionKey)
+        public Task<IEnumerable<T>> QueryAsync<T>(QueryDefinition queryDefinition, string partitionKey = null)
         {
-            return await ExecuteFunction(async () =>
-            {
-               var itemResponse = await DbContainer.ReadItemAsync<T>(id, new PartitionKey(partitionKey));
-
-               return MapResponse(itemResponse);
-            });
+            return QueryAsync<T>(new CosmosQuery(queryDefinition, partitionKey));
         }
 
         private async Task<IEnumerable<T>> QueryInternalAsync<T>(CosmosQuery cosmosQueryDef)
@@ -154,15 +149,20 @@ namespace Eshopworld.Data.CosmosDb
             });
         }
 
-        public Task<IEnumerable<T>> QueryAsync<T>(QueryDefinition queryDefinition, string partitionKey = null)
-        {
-            return QueryAsync<T>(new CosmosQuery(queryDefinition, partitionKey));
-        }
-
         public async Task<IEnumerable<DocumentContainer<T>>> QueryWithContainerAsync<T>(CosmosQuery cosmosQueryDef)
         {
             var items = await QueryAsync<dynamic>(cosmosQueryDef);
             return items.Select(MapInstance<T>);
+        }
+
+        public async Task<DocumentContainer<T>> GetByIdAsync<T>(string id, string partitionKey)
+        {
+            return await ExecuteFunction(async () =>
+            {
+                var itemResponse = await DbContainer.ReadItemAsync<T>(id, new PartitionKey(partitionKey));
+
+                return MapResponse(itemResponse);
+            });
         }
 
         private DocumentContainer<T> MapInstance<T>(object instance)

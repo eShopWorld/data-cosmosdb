@@ -13,6 +13,7 @@ namespace Eshopworld.Data.CosmosDb
         private readonly ILogger<CosmosDbClientFactory> _logger;
 
         private CosmosClient _client;
+        private bool _disposedValue;
 
         public CosmosDbClientFactory(ILogger<CosmosDbClientFactory> logger = null)
         {
@@ -84,20 +85,6 @@ namespace Eshopworld.Data.CosmosDb
             }
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Invalidate();
-            }
-        }
-
         private void ValidateConfiguration(CosmosDbConfiguration config)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
@@ -127,6 +114,26 @@ namespace Eshopworld.Data.CosmosDb
             }
 
             return uniqueKeyPolicy;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    Invalidate();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
