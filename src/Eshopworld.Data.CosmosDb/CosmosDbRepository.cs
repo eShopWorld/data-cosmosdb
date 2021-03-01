@@ -1,5 +1,4 @@
-﻿using Eshopworld.Core;
-using Eshopworld.Data.CosmosDb.Exceptions;
+﻿using Eshopworld.Data.CosmosDb.Exceptions;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json.Linq;
 using System;
@@ -7,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Eshopworld.Data.CosmosDb
 {
     public class CosmosDbRepository : ICosmosDbRepository
     {
         private readonly ICosmosDbClientFactory _clientFactory;
-        private readonly IBigBrother _bigBrother;
+        private readonly ILogger<CosmosDbRepository> _logger;
         private readonly CosmosDbConfiguration _dbSetup;
         private string _databaseId;
         private string _containerName;
@@ -25,12 +25,12 @@ namespace Eshopworld.Data.CosmosDb
         public CosmosDbRepository(
             CosmosDbConfiguration setup,
             ICosmosDbClientFactory factory,
-            IBigBrother bigBrother,
+            ILogger<CosmosDbRepository> logger = null,
             CosmosClientOptions cosmosClientOptions = null)
         {
             _dbSetup = setup ?? throw new ArgumentNullException(nameof(setup));
             _clientFactory = factory ?? throw new ArgumentNullException(nameof(factory));
-            _bigBrother = bigBrother ?? throw new ArgumentNullException(nameof(bigBrother));
+            _logger = logger;
             _cosmosClientOptions = cosmosClientOptions;
 
             if (_dbSetup.TryGetDefaults(out var dbId, out var collectionName))
@@ -201,7 +201,7 @@ namespace Eshopworld.Data.CosmosDb
                 }
                 catch (CosmosException exception)
                 {
-                    _bigBrother.Publish(exception);
+                    _logger?.LogError(exception, "A CosmosException occurred in CosmosDb package.");
                     throw;
                 }
         }

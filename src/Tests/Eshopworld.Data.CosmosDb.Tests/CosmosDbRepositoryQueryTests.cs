@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Eshopworld.Core;
 using Eshopworld.Data.CosmosDb.Exceptions;
 using Eshopworld.Tests.Core;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -44,7 +44,7 @@ namespace Eshopworld.Data.CosmosDb.Tests
                 .Setup(x => x.InitialiseClient(configuration, It.IsAny<CosmosClientOptions>()))
                 .Returns(clientMock.Object);
 
-            _repository = new CosmosDbRepository(configuration, _clientFactoryMock.Object, Mock.Of<IBigBrother>());
+            _repository = new CosmosDbRepository(configuration, _clientFactoryMock.Object, Mock.Of<ILogger<CosmosDbRepository>>());
         }
 
         [Fact, IsUnit]
