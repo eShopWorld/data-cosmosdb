@@ -5,8 +5,8 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.1.0</Version>
-    <PackageReleaseNotes>Remove BigBrother dependency, use ILogger optional dependency.</PackageReleaseNotes>
+    <Version>3.1.1</Version>
+    <PackageReleaseNotes>Resolve build warnings.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>

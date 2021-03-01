@@ -12,7 +12,7 @@ namespace Eshopworld.Data.CosmosDb
         /// <param name="config">Database and collection settings</param>
         /// <param name="clientOptions">Cosmos DB client options </param>
         /// <returns>Instance of a db client</returns>
-        CosmosClient InitialiseClient(CosmosDbConfiguration config, CosmosClientOptions clientOptions);
+        CosmosClient InitialiseClient(CosmosDbConfiguration config, CosmosClientOptions clientOptions = null);
 
         /// <summary>
         /// If any client is cached, this will invalidate (dispose) the client connection and subsequent call to InitialiseClient
