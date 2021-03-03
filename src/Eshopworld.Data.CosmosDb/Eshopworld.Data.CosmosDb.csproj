@@ -5,8 +5,8 @@
     <PackageId>Eshopworld.Data.CosmosDb</PackageId>
 	  <PackageIcon>icon.png</PackageIcon>
     <Description>Cosmos DB CRUD functionality</Description>
-    <Version>3.1.2</Version>
-    <PackageReleaseNotes>Enhance with CosmosClientOptions configuration.</PackageReleaseNotes>
+    <Version>3.1.3</Version>
+    <PackageReleaseNotes>Rollback to version 3.1.1.</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <DebugType>Portable</DebugType>
     <IncludeSource>True</IncludeSource>
