@@ -15,7 +15,7 @@ namespace Eshopworld.Data.CosmosDb
         private readonly ICosmosDbClientFactory _clientFactory;
         private readonly ILogger<CosmosDbRepository> _logger;
         private readonly CosmosDbConfiguration _dbSetup;
-        private readonly CosmosClientOptions _cosmosClientOptions;
+        private CosmosClientOptions _cosmosClientOptions;
 
         private CosmosClient _dbClient;
         private Container _container;
@@ -41,6 +41,8 @@ namespace Eshopworld.Data.CosmosDb
 
         public Container DbContainer => _container ??= DbClient.GetContainer(_databaseId, _containerName);
 
+        internal CosmosClientOptions CosmosClientOptions => _cosmosClientOptions;
+
         public void UseCollection(string collectionName, string databaseId = null)
         {
             if (databaseId != null && !_dbSetup.Databases.ContainsKey(databaseId))
@@ -53,6 +55,12 @@ namespace Eshopworld.Data.CosmosDb
                     $"The collection '{collectionName}' is not configured for '{_databaseId}' database");
 
             _containerName = collectionName;
+        }
+
+        public void WithCosmosClientOptions(Action<CosmosClientOptions> action)
+        {
+            _cosmosClientOptions ??= new CosmosClientOptions();
+            action(_cosmosClientOptions);
         }
 
         public async Task<DocumentContainer<T>> CreateAsync<T>(T data)
