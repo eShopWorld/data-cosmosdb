@@ -162,6 +162,52 @@ namespace Eshopworld.Data.CosmosDb.Tests
         }
 
         [Fact, IsUnit]
+        public void WithCosmosClientOptions_WhenNullCosmosClientOptions_ShouldCreate()
+        {
+            // Arrange
+            var config = new CosmosDbConfiguration
+            {
+                DatabaseEndpoint = string.Empty,
+                DatabaseKey = string.Empty,
+                Databases = new Dictionary<string, CosmosDbCollectionSettings[]>
+                {
+                    ["db1"] = new[] { new CosmosDbCollectionSettings("col1") }
+                }
+            };
+            var cosmosRepository = new CosmosDbRepository(config, _clientFactoryMock.Object, _logger);
+
+            // Act
+            cosmosRepository.WithCosmosClientOptions(cosmosClientOption =>
+                cosmosClientOption.AllowBulkExecution = true);
+
+            // Assert
+            cosmosRepository.CosmosClientOptions.AllowBulkExecution.Should().Be(true);
+        }
+
+        [Fact, IsUnit]
+        public void WithCosmosClientOptions_WhenNotNullCosmosClientOptions_ShouldOverride()
+        {
+            // Arrange
+            var config = new CosmosDbConfiguration
+            {
+                DatabaseEndpoint = string.Empty,
+                DatabaseKey = string.Empty,
+                Databases = new Dictionary<string, CosmosDbCollectionSettings[]>
+                {
+                    ["db1"] = new[] { new CosmosDbCollectionSettings("col1") }
+                }
+            };
+            var cosmosRepository = new CosmosDbRepository(config, _clientFactoryMock.Object, _logger, new CosmosClientOptions{AllowBulkExecution = false});
+
+            // Act
+            cosmosRepository.WithCosmosClientOptions(cosmosClientOption =>
+                cosmosClientOption.AllowBulkExecution = true);
+
+            // Assert
+            cosmosRepository.CosmosClientOptions.AllowBulkExecution.Should().Be(true);
+        }
+
+        [Fact, IsUnit]
         public async Task CreateAsync_ValidRequest_CreatesItem()
         {
             // Arrange

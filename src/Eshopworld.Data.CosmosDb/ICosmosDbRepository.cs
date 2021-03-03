@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.Cosmos;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,6 +15,12 @@ namespace Eshopworld.Data.CosmosDb
         /// </summary>
         /// <exception cref="ArgumentException">When the collection name or database id is incorrect</exception>
         void UseCollection(string collectionName, string databaseId = null);
+
+        /// <summary>
+        /// Customize behaviour with CosmosClientOptions
+        /// </summary>
+        /// <param name="action">Action to configure CosmosClientOptions</param>
+        void WithCosmosClientOptions(Action<CosmosClientOptions> action);
 
         /// <summary>
         /// Creates new instance of a document in the database.
